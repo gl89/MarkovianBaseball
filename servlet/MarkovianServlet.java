@@ -8,10 +8,10 @@ import Jama.Matrix;
 import java.text.*;
 
 public class MarkovianServlet{
-	   public void Markov(double freepass,double single, double doubles, double triple, double homerun, double outs,double runs){
+	   
+      public String[] Markov(double freepass,double single, double doubles, double triple, double homerun, double outs,double runs){
 	   
 		   DecimalFormat df = new DecimalFormat("0.000");
-		   DecimalFormat rf = new DecimalFormat("#");
 		  
 		   double RS = runs;//actual runs scored in the season 2015
 		  
@@ -123,13 +123,16 @@ public class MarkovianServlet{
 			   IQMatrix [row][column] = IMatrix [row][column] - QMatrix [row][column];                                                                                    
 		   } 
 				
-		   //Fundamental Matrix this is where we get the important stuff from. 
-		   Matrix GetInverse = new Matrix(IQMatrix);
-		  double NMatrix[][] = GetInverse.inverse().getArray();
+		//Fundamental Matrix this is where we get the important stuff from. 
+		Matrix GetInverse = new Matrix(IQMatrix);
+		double NMatrix[][] = GetInverse.inverse().getArray();
 		  
         //System.out.println("   0,0   1,0   2,0   3,0   12,0  13,0  23,0 123,0  0,1   1,1   2,1   3,1  12,1  13,1  23,1  123,1  0,2   1,2   2,2   3,2  12,2  13,2   23,2  123,2");
-		  //System.out.println("Fundemantal Markov Matrix (Expected number of batters starting from a state)");
+		 //System.out.println("Fundemantal Markov Matrix (Expected number of batters starting from a state)");
 		  
+        //should only be 4 stuff to return
+        String[] Info = new String[4];
+        
         StringBuffer sb1 = new StringBuffer();
         sb1.append("{");
 		  for (int i = 0; i < 24; i++){
@@ -140,6 +143,7 @@ public class MarkovianServlet{
 		  }
         sb1.append("}");
         
+        Info[0] = sb1.toString();
 		 
 		  //Expected number of runs that can be scored from one play
 		  double [] [] REMatrix = new double [24][1]; 
@@ -157,6 +161,8 @@ public class MarkovianServlet{
 		  }
 		  sb2.append("}");
 		  
+        Info[1] = sb2.toString();
+        
 		  double [] [] RSMatrix = new double [24][1]; 
 		  for (int i=0; i<24; i++)
 			 for (int j=0; j<1; j++)
@@ -165,8 +171,7 @@ public class MarkovianServlet{
 		  }
 
 		  //number of runs scored in the remainder of the inning starting from each of the 24 starting states
-		  //System.out.print("Expected number of runs scored from a given state");
-        
+		  //System.out.print("Expected number of runs scored from a given state")
         StringBuffer sb3 = new StringBuffer();
 		  sb3.append("{");
 		  System.out.print("{ ");
@@ -177,10 +182,14 @@ public class MarkovianServlet{
 		  }  
         sb3.append("}");
         
+        Info[2] = sb3.toString();
+        
 		  double ERS = RSMatrix[0][0]*innings;
+        
+        Info[3] = ""+df.format(ERS)+"";
+        
+        return Info;   
+      }       	
+     
 
-		  System.out.println("Expected number of runs scored for the season " + (int)ERS); 
-		  //System.out.println("Actual number of runs scored for the season " + (int)RS); 
-		  
-      }       	   
 }
